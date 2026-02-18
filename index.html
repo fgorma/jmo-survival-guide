@@ -6,6 +6,7 @@
     <title>JMO Survival Guide</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         /* THEME VARIABLES */
         :root {
@@ -20,11 +21,11 @@
             --nav-bg: #ffffff;
         }
 
-        /* Dark Theme Class */
+        /* Dark Theme Class (Lighter Black/Charcoal) */
         [data-theme="dark"] {
-            --bg: #1a1a1b; /* Your Lighter Black */
+            --bg: #1a1a1b; 
             --header: #212122;
-            --card: #ffffff; /* Keeping cards white for that "pop" */
+            --card: #ffffff; 
             --text-main: #ffffff;
             --text-muted: #a0a0a2;
             --border: #2d2d2e;
@@ -34,7 +35,7 @@
         body { 
             background-color: var(--bg); 
             padding-bottom: 90px; 
-            font-family: -apple-system, sans-serif; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             color: var(--text-main);
             transition: background 0.3s ease;
         }
@@ -46,12 +47,32 @@
             margin-bottom: 10px;
         }
 
+        /* High-Contrast Search Bar */
+        .search-container {
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
         .search-input {
             border-radius: 50px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            padding: 12px 20px;
+            background: #ffffff !important; /* Always white for visibility */
+            border: none;
+            color: #1a1a1b !important;
+            padding: 12px 20px 12px 45px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            font-weight: 500;
+        }
+        
+        .search-input::placeholder { color: #6c757d; }
+        
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            z-index: 10;
         }
 
         .section-header {
@@ -69,12 +90,14 @@
             border-radius: 20px; 
             cursor: pointer; 
             height: 100%; 
-            color: #1a1a1b; /* Text inside white cards always dark */
+            color: #1a1a1b; 
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
         }
+        .action-card:active { transform: scale(0.96); }
 
-        .admin-list { background-color: var(--card); border-radius: 20px; overflow: hidden; margin: 0 5px; }
-        .list-group-item { background-color: var(--card); border-color: #f0f0f0; color: #1a1a1b; padding: 18px; font-weight: 600; }
+        .admin-list { background-color: var(--card); border-radius: 20px; overflow: hidden; margin: 0 5px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .list-group-item { background-color: var(--card); border-color: #f0f0f0; color: #1a1a1b; padding: 18px; font-weight: 600; cursor: pointer; }
 
         .bottom-nav { 
             position: fixed; bottom: 0; width: 100%; 
@@ -83,19 +106,29 @@
             border-top: 1px solid var(--border); 
             z-index: 1000;
         }
-        .nav-item { text-align: center; font-size: 0.75rem; color: var(--text-muted); text-decoration: none; cursor: pointer; }
+        
+        .nav-item { text-align: center; font-size: 0.75rem; color: var(--text-muted); text-decoration: none; cursor: pointer; flex: 1; }
         .nav-item.active { color: var(--primary); }
         
         .icon-box { width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 1.3rem; margin-bottom: 10px; }
+        
+        /* Wizard & Modal Utility */
+        .step-card { display: none; color: #1a1a1b; }
+        .step-card.active { display: block; }
+        .modal-content { border-radius: 25px; border: none; }
     </style>
 </head>
 <body data-theme="light">
 
     <div class="hero text-center">
         <h2 class="fw-bold mb-1">JMO Survival Guide</h2>
-        <p class="opacity-50 small">Clinical & Admin Shortcuts</p>
+        <p class="opacity-50 small">Don't just survive, thrive.</p>
+        
         <div class="container mt-3">
-            <input type="text" class="form-control search-input" placeholder="Search resources...">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="form-control search-input" placeholder="Search resources...">
+            </div>
         </div>
     </div>
 
@@ -103,17 +136,75 @@
         <div class="section-header">Critical Tools</div>
         <div class="row g-3 px-1">
             <div class="col-6">
-                <div class="card action-card p-3" onclick="alert('Rad Hub')">
+                <div class="card action-card p-3" data-bs-toggle="modal" data-bs-target="#radModal">
                     <div class="icon-box bg-primary bg-opacity-10 text-primary"><i class="fas fa-x-ray"></i></div>
                     <h6 class="fw-bold mb-1">Radiology Hub</h6>
                     <small class="text-muted">Server codes</small>
                 </div>
             </div>
             <div class="col-6">
-                <div class="card action-card p-3" onclick="alert('Death Certs')">
+                <div class="card action-card p-3" data-bs-toggle="modal" data-bs-target="#deathModal">
                     <div class="icon-box bg-danger bg-opacity-10 text-danger"><i class="fas fa-file-medical"></i></div>
                     <h6 class="fw-bold mb-1">Death Certs</h6>
                     <small class="text-muted">Coroner Wizard</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-header">Admin & Money</div>
+        <div class="admin-list">
+            <div class="list-group list-group-flush">
+                <div class="list-group-item d-flex justify-content-between align-items-center" onclick="alert('Calculator coming next!')">
+                    <span><i class="fas fa-piggy-bank text-warning me-3"></i> Salary Packaging</span>
+                    <i class="fas fa-chevron-right text-muted small"></i>
+                </div>
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-clock text-info me-3"></i> Claiming Overtime</span>
+                    <i class="fas fa-chevron-right text-muted small"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="radModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header"><h5>Radiology Servers</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body p-0">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div><div class="small fw-bold">I-MED Radiology</div><code class="small">pacs.i-med.com.au</code></div>
+                            <button class="btn btn-sm btn-primary" onclick="navigator.clipboard.writeText('https://pacs.i-med.com.au')">Copy</button>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div><div class="small fw-bold">Lumus Imaging</div><code class="small">pacs.lumusimaging.com.au</code></div>
+                            <button class="btn btn-sm btn-primary" onclick="navigator.clipboard.writeText('https://pacs.lumusimaging.com.au')">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deathModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header"><h5>Coroner Wizard</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <div class="step-card active" id="step1">
+                        <h6>1. Is the identity of the patient unknown?</h6>
+                        <div class="d-grid gap-2 mt-3"><button class="btn btn-danger" onclick="showRes('coroner')">Yes</button><button class="btn btn-outline-primary" onclick="nextStep(2)">No</button></div>
+                    </div>
+                    <div class="step-card" id="step2">
+                        <h6>2. Was the death violent or resulting from an injury/fall?</h6>
+                        <div class="d-grid gap-2 mt-3"><button class="btn btn-danger" onclick="showRes('coroner')">Yes</button><button class="btn btn-outline-primary" onclick="nextStep(3)">No</button></div>
+                    </div>
+                    <div id="res-coroner" class="step-card text-center">
+                        <i class="fas fa-exclamation-triangle text-danger fa-3x mb-3"></i>
+                        <h5 class="text-danger fw-bold">REPORT TO CORONER</h5>
+                        <p class="small">Do not sign the death certificate.</p>
+                        <button class="btn btn-secondary btn-sm" onclick="resetWizard()">Start Over</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -131,16 +222,13 @@
     <div class="modal fade" id="settingsModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold">Display Settings</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
+                <div class="modal-header"><h5 class="modal-title fw-bold">Settings</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
                 <div class="modal-body">
-                    <p class="text-muted small">Choose how the guide looks on your device.</p>
+                    <label class="small fw-bold text-muted mb-2">Display Mode</label>
                     <div class="d-grid gap-2">
                         <button class="btn btn-outline-dark" onclick="setTheme('light')"><i class="fas fa-sun me-2"></i> Always Light</button>
-                        <button class="btn btn-dark" onclick="setTheme('dark')"><i class="fas fa-moon me-2"></i> Always Dark (Charcoal)</button>
-                        <button class="btn btn-primary" onclick="setTheme('auto')"><i class="fas fa-sync me-2"></i> Follow Phone System</button>
+                        <button class="btn btn-dark" onclick="setTheme('dark')"><i class="fas fa-moon me-2"></i> Always Dark</button>
+                        <button class="btn btn-primary" onclick="setTheme('auto')"><i class="fas fa-sync me-2"></i> Follow System</button>
                     </div>
                 </div>
             </div>
@@ -149,36 +237,25 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // --- THEME ENGINE ---
-        function setTheme(mode) {
-            const body = document.documentElement;
-            if (mode === 'auto') {
-                localStorage.removeItem('user-theme');
-                applySystemTheme();
-            } else {
-                body.setAttribute('data-theme', mode);
-                localStorage.setItem('user-theme', mode);
+        // THEME LOGIC
+        function setTheme(m) {
+            if(m === 'auto') { localStorage.removeItem('theme'); applyTheme(); }
+            else { document.documentElement.setAttribute('data-theme', m); localStorage.setItem('theme', m); }
+        }
+        function applyTheme() {
+            const saved = localStorage.getItem('theme');
+            if(saved) document.documentElement.setAttribute('data-theme', saved);
+            else {
+                const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
             }
         }
+        applyTheme();
 
-        function applySystemTheme() {
-            if (localStorage.getItem('user-theme')) {
-                document.documentElement.setAttribute('data-theme', localStorage.getItem('user-theme'));
-            } else {
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
-            }
-        }
-
-        // Run on load
-        applySystemTheme();
-
-        // Listen for system changes while app is open
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-            if (!localStorage.getItem('user-theme')) {
-                document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
-            }
-        });
+        // WIZARD LOGIC
+        function nextStep(s) { document.querySelectorAll('.step-card').forEach(c => c.classList.remove('active')); document.getElementById('step'+s).classList.add('active'); }
+        function showRes(r) { document.querySelectorAll('.step-card').forEach(c => c.classList.remove('active')); document.getElementById('res-'+r).classList.add('active'); }
+        function resetWizard() { document.querySelectorAll('.step-card').forEach(c => c.classList.remove('active')); document.getElementById('step1').classList.add('active'); }
     </script>
 </body>
 </html>
